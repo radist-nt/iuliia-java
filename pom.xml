@@ -1,0 +1,260 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.github.radist-nt</groupId>
+	<artifactId>iuliia-java</artifactId>
+	<version>0.1</version>
+
+	<name>com.github.radist-nt:iuliia-java</name>
+	<description>Transliterate Cyrillic → Latin in every possible way https://dangry.ru/iuliia/</description>
+	<url>https://github.com/radist-nt/iuliia-java</url>
+
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>http://www.opensource.org/licenses/mit-license.php</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<scm>
+		<url>https://github.com/radist-nt/iuliia-java</url>
+		<connection>scm:git:https://github.com/radist-nt/iuliia-java.git</connection>
+		<developerConnection>scm:git:https://github.com/radist-nt/iuliia-java.git</developerConnection>
+	</scm>
+
+	<developers>
+		<developer>
+			<id>radist-nt</id>
+			<name>Andrey Marinchuk</name>
+			<url>https://github.com/radist-nt/</url>
+		</developer>
+	</developers>
+
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>9</version>
+	</parent>
+
+	<properties>
+		<java.version>1.8</java.version>
+		<maven.compiler.source>${java.version}</maven.compiler.source>
+		<maven.compiler.target>${java.version}</maven.compiler.target>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<jackson.version>2.11.0</jackson.version>
+		<iuliia.tmpdir>${project.build.directory}/iuliia</iuliia.tmpdir>
+	</properties>
+
+	<dependencies>
+		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.google.code.findbugs/jsr305 -->
+		<dependency>
+			<groupId>com.google.code.findbugs</groupId>
+			<artifactId>jsr305</artifactId>
+			<version>3.0.2</version>
+			<optional>true</optional>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.testng/testng -->
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+			<version>6.8</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.6</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-scm-plugin</artifactId>
+				<version>1.11.2</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>checkout</goal>
+						</goals>
+						<phase>initialize</phase>
+						<configuration>
+							<connectionUrl>scm:git:https://github.com/nalgeon/iuliia.git</connectionUrl>
+							<developerConnectionUrl>scm:git:https://github.com/nalgeon/iuliia.git</developerConnectionUrl>
+							<checkoutDirectory>${iuliia.tmpdir}</checkoutDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.gmaven</groupId>
+				<artifactId>groovy-maven-plugin</artifactId>
+				<version>2.1.1</version>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>execute</goal>
+						</goals>
+						<configuration>
+							<source><![CDATA[
+File file = new File("target/iuliia/schema.jsd");
+String str = file.getText("UTF-8");
+// append "existingJavaType": "java.util.Map<String,String>" to mapping objects
+str = str.replaceAll("mapping\"\\s*:\\s*\\{", "mapping\": {\"existingJavaType\": \"java.util.Map<String,String>\",");
+// append "javaJsonView": "com.github.radist_nt.iuliia.impl.ExampleView" to examples
+str = str.replaceAll("\"samples\"\\s*:\\s*\\{", "\"samples\": {\"javaJsonView\": \"com.github.radist_nt.iuliia.impl.MappingLoader.ExampleView\",");
+file.withWriter("UTF-8") {writer -> writer.writeLine str} ]]>
+							</source>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.jsonschema2pojo</groupId>
+				<artifactId>jsonschema2pojo-maven-plugin</artifactId>
+				<version>1.0.2</version>
+				<configuration>
+					<sourcePaths>${iuliia.tmpdir}/schema.jsd</sourcePaths>
+					<targetPackage>com.github.radist_nt.iuliia.impl</targetPackage>
+					<annotationStyle>jackson2</annotationStyle>
+					<initializeCollections>false</initializeCollections>
+					<includeAdditionalProperties>false</includeAdditionalProperties>
+					<includeHashcodeAndEquals>false</includeHashcodeAndEquals>
+					<includeToString>false</includeToString>
+					<removeOldOutput>true</removeOldOutput>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>3.2.0</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<excludeResources>true</excludeResources>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.2.0</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<excludePackageNames>com.github.radist_nt.iuliia.impl</excludePackageNames>
+				</configuration>
+			</plugin>
+		</plugins>
+		<resources>
+			<resource>
+				<directory>${iuliia.tmpdir}</directory>
+				<includes>
+					<include>*.json</include>
+				</includes>
+				<targetPath>/com/github/radist_nt/iuliia/impl/schemas</targetPath>
+			</resource>
+		</resources>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<configuration>
+						<source>${java.version}</source>
+						<target>${java.version}</target>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.apache.maven.plugins
+										</groupId>
+										<artifactId>
+											maven-scm-plugin
+										</artifactId>
+										<versionRange>
+											[1.11.2,)
+										</versionRange>
+										<goals>
+											<goal>checkout</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<execute />
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.codehaus.gmaven
+										</groupId>
+										<artifactId>
+											groovy-maven-plugin
+										</artifactId>
+										<versionRange>
+											[2.1.1,)
+										</versionRange>
+										<goals>
+											<goal>execute</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<execute />
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+				<!--plugin> <artifactId>maven-resources-plugin</artifactId> <configuration> 
+					<encoding>UTF-8</encoding> </configuration> </plugin -->
+			</plugins>
+		</pluginManagement>
+	</build>
+</project>
