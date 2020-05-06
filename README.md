@@ -12,6 +12,11 @@ Transliteration means representing Cyrillic data (mainly names and geographic lo
 
 For schema details and other information, see <https://dangry.ru/iuliia> (in Russian).
 
+## Requirements
+
+-   Java 8 or higher
+-   Jackson 2 (see [another solution](https://github.com/massita99/iuliia-java) if you prefer Gson)
+
 ## Installation
 Maven dependency (works fine with maven 3.6.3)
 ```xml
@@ -24,7 +29,7 @@ Maven dependency (works fine with maven 3.6.3)
 
 ```
 
-## Usage (Java 8 and higher)
+## Usage
 
 Simple example:
 
