@@ -63,7 +63,7 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 Make sure to add or update tests as appropriate.
 
-Test "testConstants" could fail after adding new transliteration schemas in https://github.com/nalgeon/iuliia. To make it pass, temporary the test "generateIuliiaConstants" and run `mvn test`. Reformat code before commiting (using built-in eclipse formatting settings).
+Test "testConstants" could fail after adding new transliteration schemas in https://github.com/nalgeon/iuliia. To make it pass, temporary enable the test "generateIuliiaConstants" and run `mvn test`. Reformat code before commiting (using built-in eclipse formatting settings).
 
 ## License
 
