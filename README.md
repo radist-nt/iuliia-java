@@ -13,7 +13,7 @@ Transliteration means representing Cyrillic data (mainly names and geographic lo
 For schema details and other information, see <https://dangry.ru/iuliia> (in Russian).
 
 ## Installation
-Maven dependency (not published yet)
+Maven dependency (works fine with maven 3.6.3)
 ```xml
 <!-- https://mvnrepository.com/artifact/com.github.radist-nt/iuliia-java -->
 <dependency>
