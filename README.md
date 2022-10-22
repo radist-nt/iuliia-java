@@ -24,7 +24,7 @@ Maven dependency (works fine with maven 3.6.3)
 <dependency>
     <groupId>com.github.radist-nt</groupId>
     <artifactId>iuliia-java</artifactId>
-    <version>0.1.1</version>
+    <version>0.1.2</version>
 </dependency>
 
 ```
