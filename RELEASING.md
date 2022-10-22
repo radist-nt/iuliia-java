@@ -14,9 +14,12 @@
 
 ## Release to maven
 
-- Run command `mvn -P release deploy`
-- Login to https://oss.sonatype.org/, navigate to staging repositories, verify repository, close and release it.
+- run command `mvn -P release deploy`
+- login to https://oss.sonatype.org/, navigate to staging repositories, verify repository, close and release it
 
+## After release checklist
 
+- navigate to https://github.com/radist-nt/iuliia-java/tags and create the release
+- attach artifacts from target directory (3 jars, 1 pom, signatures) to release
 
 
