@@ -15,7 +15,7 @@
 ## Release to maven
 
 - Run command `mvn -P release deploy`
-- Login to https://oss.sonatype.org/, navigate to staging repositories, verify repository and promote it
+- Login to https://oss.sonatype.org/, navigate to staging repositories, verify repository, close and release it.
 
 
 
